@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>WONCA EMR Newsletter · SEP 2026</title>
+  <meta name="description" content="Read the WONCA EMR Newsletter (SEP 2026) as an interactive flipbook — turn pages like the printed A4 magazine.">
+  <meta name="theme-color" content="#0d0f12">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WONCA EMR Newsletter · SEP 2026">
+  <meta property="og:description" content="Read the WONCA EMR Newsletter (SEP 2026) as an interactive flipbook — turn pages like the printed A4 magazine.">
+  <meta property="og:image" content="img/cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0f12'/%3E%3Cpath d='M9 8h7l3 3v13H9z' fill='%23fff'/%3E%3Cpath d='M16 8v4h7v12h-4' fill='%23c9a227'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"></span>
+        <div class="brand-text">
+          <h1 id="site-title">Magazine</h1>
+          <p id="site-subtitle">A4 edition</p>
+        </div>
+      </div>
+      <div class="actions">
+        <a id="btn-download" class="btn" href="pdf/magazine.pdf" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Download</span>
+        </a>
+        <button id="btn-fullscreen" class="btn btn-ghost" type="button" aria-label="Toggle fullscreen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="stage" id="stage">
+      <div class="loader" id="loader" role="status" aria-live="polite">
+        <div class="loader-card">
+          <span class="spinner" aria-hidden="true"></span>
+          <p class="loader-title">Opening magazine</p>
+          <div class="track"><div class="track-fill" id="load-fill"></div></div>
+          <p class="loader-meta" id="load-meta">Preparing pages…</p>
+        </div>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <div class="empty-card">
+          <span class="empty-badge">Coming soon</span>
+          <h2>The magazine is on its way</h2>
+          <p>Export the page images, run <code>tools/build_pages.py</code>, and the flipbook will appear here.</p>
+        </div>
+      </div>
+
+      <div class="error" id="error" hidden>
+        <div class="empty-card">
+          <h2>Something went wrong</h2>
+          <p id="error-msg">The magazine could not be loaded.</p>
+          <button class="btn" id="btn-retry" type="button">Try again</button>
+        </div>
+      </div>
+
+      <div class="reader" id="reader" hidden>
+        <button class="nav-arrow" id="btn-prev" type="button" aria-label="Previous page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="book-shell" id="book-shell">
+          <div class="book" id="book"></div>
+        </div>
+
+        <button class="nav-arrow" id="btn-next" type="button" aria-label="Next page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </main>
+
+    <footer class="statusbar">
+      <span class="page-label" id="page-label">—</span>
+      <div class="track status-track"><div class="track-fill" id="page-fill"></div></div>
+      <span class="page-total" id="page-total">—</span>
+    </footer>
+  </div>
+
+  <script src="vendor/page-flip.browser.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

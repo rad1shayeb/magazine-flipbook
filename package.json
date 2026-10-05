@@ -1,0 +1,12 @@
+{
+  "name": "magazine-flipbook",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static A4/A3 flipbook reader for the WONCA EMR Newsletter",
+  "scripts": {
+    "start": "serve -l $PORT ."
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
