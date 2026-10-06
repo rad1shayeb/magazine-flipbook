@@ -67,49 +67,10 @@ body {
   min-width: 0;
 }
 
-.mark {
-  width: 30px;
-  height: 38px;
-  border-radius: 3px;
-  background: linear-gradient(150deg, #ffffff 0%, #e9ebee 55%, #cfd3d8 100%);
-  position: relative;
-  flex: none;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
-}
-
-.mark::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0));
-  border-right: 1px solid rgba(0, 0, 0, 0.18);
-}
-
-.brand-text {
-  min-width: 0;
-}
-
-.brand-text h1 {
-  font-family: var(--serif);
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  margin: 0;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.brand-text p {
-  margin: 2px 0 0;
-  font-size: 11.5px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--muted);
+.brand-logo {
+  display: block;
+  height: 42px;
+  width: auto;
 }
 
 .actions {
@@ -117,6 +78,35 @@ body {
   align-items: center;
   gap: 9px;
   flex: none;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: var(--muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.social:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.social svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .btn {
@@ -196,10 +186,21 @@ body {
 #book {
   margin: 0 auto;
   filter: drop-shadow(0 22px 46px rgba(0, 0, 0, 0.55));
+  transition: transform 0.48s ease;
+}
+
+/* Solo views (cover / back cover): the book is two pages wide, so shift it
+   by a quarter of its width to centre the single A4 page in the stage. */
+#book[data-solo="right"] {
+  transform: translateX(-25%);
+}
+
+#book[data-solo="left"] {
+  transform: translateX(25%);
 }
 
 .stf__block {
-  background: #ffffff;
+  background: transparent;
 }
 
 .fb-page {
@@ -219,10 +220,31 @@ body {
   visibility: hidden;
 }
 
+.fb-page.is-loading .qr-hotspot {
+  visibility: hidden;
+}
+
 .fb-page.is-loading {
   background: linear-gradient(100deg, #f1f2f4 32%, #e3e6ea 50%, #f1f2f4 68%);
   background-size: 220% 100%;
   animation: shimmer 1.25s linear infinite;
+}
+
+.qr-hotspot {
+  position: absolute;
+  z-index: 4;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qr-hotspot:hover,
+.qr-hotspot:focus-visible {
+  border-color: rgba(201, 162, 39, 0.95);
+  background: rgba(201, 162, 39, 0.18);
+  outline: none;
 }
 
 @keyframes shimmer {
@@ -366,6 +388,55 @@ body {
   margin-top: 18px;
 }
 
+/* ---------- link confirmation modal ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 6, 8, 0.62);
+  backdrop-filter: blur(6px);
+}
+
+.modal-card {
+  width: min(440px, 100%);
+  padding: 26px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+}
+
+.modal-card h2 {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.modal-url {
+  margin: 0 0 22px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions .btn-ghost {
+  width: auto;
+  padding: 0 15px;
+}
+
 /* ---------- status bar ---------- */
 
 .statusbar {
@@ -418,12 +489,23 @@ body {
     padding: 11px 14px;
   }
 
-  .brand-text h1 {
-    font-size: 16.5px;
+  .brand-logo {
+    height: 34px;
   }
 
-  .brand-text p {
-    font-size: 10.5px;
+  .socials {
+    gap: 0;
+    margin-right: 2px;
+  }
+
+  .social {
+    width: 30px;
+    height: 30px;
+  }
+
+  .social svg {
+    width: 15px;
+    height: 15px;
   }
 
   .btn span {

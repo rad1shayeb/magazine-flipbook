@@ -32,7 +32,18 @@ view 8:  [ Back cover ]            (A4 alone)
    (A4 @ 150 dpi), writes them to `img/pages/pNN.jpg`, regenerates
    `img/cover.png`, and rewrites the manifest `js/pages.js`.
 
-3. To offer the PDF download, replace `pdf/magazine.pdf` (and adjust
+3. Re-scan the pages for QR codes so every code stays clickable:
+
+   ```sh
+   python3 tools/find_qrcodes.py ~/Downloads/flipbook
+   ```
+
+   This decodes the QR codes on the full-resolution source pages and writes
+   their positions to `js/links.js`. Clicking a code in the reader asks for
+   confirmation before opening the link in a new tab.
+   Requires: `pip3 install opencv-python-headless pillow` (optional: `zxing-cpp`).
+
+4. To offer the PDF download, replace `pdf/magazine.pdf` (and adjust
    `pdfPath` / `fileName` in `js/config.js` if the name changes).
 
 Requires Python 3 with Pillow (`pip3 install Pillow`).

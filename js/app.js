@@ -3,6 +3,7 @@
 
   var CFG = window.MAGAZINE || {};
   var PAGES = CFG.pages || [];
+  var LINKS = window.MAGAZINE_LINKS || {};
   var A4 = 297 / 210;
   var ARROW_SPACE = 148;
   var STAGE_PAD = 28;
@@ -25,10 +26,12 @@
     pageLabel: document.getElementById("page-label"),
     pageTotal: document.getElementById("page-total"),
     pageFill: document.getElementById("page-fill"),
-    title: document.getElementById("site-title"),
-    subtitle: document.getElementById("site-subtitle"),
     download: document.getElementById("btn-download"),
-    fullscreen: document.getElementById("btn-fullscreen")
+    fullscreen: document.getElementById("btn-fullscreen"),
+    modal: document.getElementById("link-modal"),
+    modalUrl: document.getElementById("modal-url"),
+    modalOpen: document.getElementById("modal-open"),
+    modalCancel: document.getElementById("modal-cancel")
   };
 
   var state = {
@@ -41,13 +44,13 @@
     booted: false
   };
 
+  var pendingUrl = null;
+
   function applyConfig() {
     if (CFG.title) {
-      els.title.textContent = CFG.title;
       document.title =
         CFG.title + (CFG.subtitle ? " · " + CFG.subtitle : " — Flipbook");
     }
-    if (CFG.subtitle) els.subtitle.textContent = CFG.subtitle;
     if (CFG.pdfPath) {
       els.download.href = CFG.pdfPath;
       if (CFG.fileName) els.download.setAttribute("download", CFG.fileName);
@@ -121,6 +124,13 @@
     return "Pages " + (r.from + 1) + "–" + (r.to + 1);
   }
 
+  function soloFor(i) {
+    if (!state.layout || !state.layout.landscape || state.count <= 1) return "";
+    if (i <= 0) return "right";
+    if (i >= state.count - 1) return "left";
+    return "";
+  }
+
   function updateChrome() {
     var i = state.index;
     els.pageLabel.textContent = labelFor(i);
@@ -129,6 +139,45 @@
       (state.count > 1 ? (i / (state.count - 1)) * 100 : 100).toFixed(1) + "%";
     els.prev.disabled = i <= 0;
     els.next.disabled = i >= state.count - 1;
+    if (els.book) els.book.setAttribute("data-solo", soloFor(i));
+  }
+
+  function addHotspots(div, pagePath) {
+    var spots = LINKS[pagePath];
+    if (!spots || !spots.length) return;
+    spots.forEach(function (s) {
+      var a = document.createElement("a");
+      a.className = "qr-hotspot";
+      a.href = s.url;
+      a.setAttribute("aria-label", "Open link: " + s.url);
+      a.title = s.url;
+      a.style.left = (s.x * 100).toFixed(4) + "%";
+      a.style.top = (s.y * 100).toFixed(4) + "%";
+      a.style.width = (s.w * 100).toFixed(4) + "%";
+      a.style.height = (s.h * 100).toFixed(4) + "%";
+      ["pointerdown", "mousedown", "touchstart", "click"].forEach(function (ev) {
+        a.addEventListener(ev, function (e) {
+          e.stopPropagation();
+        });
+      });
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        openLinkModal(s.url);
+      });
+      div.appendChild(a);
+    });
+  }
+
+  function openLinkModal(url) {
+    pendingUrl = url;
+    els.modalUrl.textContent = url;
+    els.modal.hidden = false;
+    els.modalOpen.focus();
+  }
+
+  function closeLinkModal() {
+    els.modal.hidden = true;
+    pendingUrl = null;
   }
 
   function build(startIndex) {
@@ -142,9 +191,12 @@
     // destroy() removes the container element itself, so always start from a
     // fresh node re-attached to the shell (otherwise the book detaches on rebuild).
     els.bookShell.innerHTML = "";
+    var startIdx = Math.max(0, Math.min(startIndex, state.count - 1));
     var book = document.createElement("div");
     book.className = "book";
     book.id = "book";
+    // Set before attaching so the solo shift never animates on first paint.
+    book.setAttribute("data-solo", soloFor(startIdx));
     els.bookShell.appendChild(book);
     els.book = book;
 
@@ -181,6 +233,7 @@
         img.src = PAGES[i];
         if (img.complete) settle(img.naturalWidth > 0);
 
+        addHotspots(div, PAGES[i]);
         nodes.push(div);
       })(i);
     }
@@ -195,7 +248,7 @@
       flippingTime: 480,
       usePortrait: true,
       startZIndex: 0,
-      startPage: startIndex,
+      startPage: startIdx,
       autoSize: false,
       maxShadowOpacity: 0.55,
       showCover: true,
@@ -215,7 +268,7 @@
       }
     });
 
-    state.index = Math.max(0, Math.min(startIndex, state.count - 1));
+    state.index = startIdx;
     updateChrome();
   }
 
@@ -283,6 +336,13 @@
       if (!state.booted || e.metaKey || e.ctrlKey || e.altKey) return;
       var tag = (e.target && e.target.tagName) || "";
       if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (!els.modal.hidden) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeLinkModal();
+        }
+        return;
+      }
       if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
         e.preventDefault();
         go(targetNext());
@@ -302,6 +362,15 @@
     });
 
     els.fullscreen.addEventListener("click", toggleFullscreen);
+
+    els.modalCancel.addEventListener("click", closeLinkModal);
+    els.modal.addEventListener("click", function (e) {
+      if (e.target === els.modal) closeLinkModal();
+    });
+    els.modalOpen.addEventListener("click", function () {
+      if (pendingUrl) window.open(pendingUrl, "_blank", "noopener,noreferrer");
+      closeLinkModal();
+    });
 
     els.retry.addEventListener("click", function () {
       hide(els.error);
